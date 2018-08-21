@@ -2,6 +2,8 @@
 
 namespace Inteldev\ReCaptcha;
 
+use Bitrix\Main\Page\Asset;
+
 class Main 
 {
     public $moduleId = 'inteldev.recaptcha';
@@ -20,10 +22,10 @@ class Main
         return $this->siteKey;
     }
 
-    public function validate($token)
+    public function validate()
     {
-        if (!empty($token)) {
-            $recaptchaResult = $this->getRecaptchaResult($token);
+        if (!empty($_REQUEST['g-recaptcha-response'])) {
+            $recaptchaResult = $this->getRecaptchaResult($_REQUEST['g-recaptcha-response']);
             return $recaptchaResult->success;
         } else {
             return false;
@@ -45,6 +47,26 @@ class Main
         }
 
         return false;
+    }
+
+    public function assetJs($render = null, $callback = null)
+    {
+        $paramsJs = array();
+        $apiJs = 'https://www.google.com/recaptcha/api.js';
+
+        if ($callback) {
+            $paramsJs['onload'] = $callback;
+        }
+
+        if ($render) {
+            $paramsJs['render'] = $render;
+        }
+
+        if (!empty($paramsJs)) {
+            $apiJs .= '?' . http_build_query($paramsJs);
+        }
+
+        Asset::getInstance()->addJs($apiJs);
     }
 
     private function setTagAttribute($value, $parameter)

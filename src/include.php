@@ -1,10 +1,21 @@
 <?php
-use Bitrix\Main\Page\Asset;
-Asset::getInstance()->addJs('https://www.google.com/recaptcha/api.js');
 
-Bitrix\Main\Loader::registerAutoloadClasses(
-    "inteldev.recaptcha",
+use Bitrix\Main\Loader;
+use Bitrix\Main\EventManager;
+
+$moduleId = 'inteldev.recaptcha';
+
+/*
+ * Autoload of module classes
+ */
+Loader::registerAutoloadClasses(
+    $moduleId,
     array(
-        "Inteldev\\ReCaptcha\\Main" => "lib/main.php",
+        'Inteldev\\ReCaptcha\\Main' => 'lib/main.php',
     )
 );
+
+/*
+ * Connection files of scripting APIs Google reCAPTCHA
+ */
+EventManager::getInstance()->registerEventHandler('main', 'OnProlog', $moduleId, 'Inteldev\\ReCaptcha\\Main', 'assetJs');
